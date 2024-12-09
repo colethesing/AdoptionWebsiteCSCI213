@@ -1,0 +1,45 @@
+﻿@page "/forms"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using AdoptionWebsiteTest.Models
+@using AdoptionWebsiteTest.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<AdoptionWebsiteTest.Data.AdoptionWebsiteTestContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="forms/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Form">
+    <PropertyColumn Property="form => form.FullName" />
+    <PropertyColumn Property="form => form.Email" />
+    <PropertyColumn Property="form => form.PhoneNumber" />
+    <PropertyColumn Property="form => form.Address" />
+    <PropertyColumn Property="form => form.City" />
+    <PropertyColumn Property="form => form.State" />
+    <PropertyColumn Property="form => form.HouseSize" />
+    <PropertyColumn Property="form => form.NumberOfPets" />
+    <PropertyColumn Property="form => form.PreviousDogOwner" />
+    <PropertyColumn Property="form => form.QuestionsConcerns" />
+
+    <TemplateColumn Context="form">
+        <a href="@($"forms/edit?id={form.Id}")">Edit</a> |
+        <a href="@($"forms/details?id={form.Id}")">Details</a> |
+        <a href="@($"forms/delete?id={form.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private AdoptionWebsiteTestContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

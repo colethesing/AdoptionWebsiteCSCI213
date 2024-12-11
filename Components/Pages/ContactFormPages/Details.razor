@@ -1,0 +1,48 @@
+﻿@page "/contactforms/details"
+@using Microsoft.EntityFrameworkCore
+@using AdoptionWebsiteTest.Models
+@inject IDbContextFactory<AdoptionWebsiteTest.Data.AdoptionWebsiteTestContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>ContactForm</h2>
+    <hr />
+    @if (contactform is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Email</dt>
+            <dd class="col-sm-10">@contactform.Email</dd>
+            <dt class="col-sm-2">QuestionsAndConcerns</dt>
+            <dd class="col-sm-10">@contactform.QuestionsAndConcerns</dd>
+        </dl>
+        <div>
+            <a href="@($"/contactforms/edit?id={contactform.Id}")">Edit</a> |
+            <a href="@($"/contactforms")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private ContactForm? contactform;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        contactform = await context.ContactForm.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (contactform is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

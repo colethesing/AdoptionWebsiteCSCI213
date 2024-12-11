@@ -1,0 +1,94 @@
+﻿@page "/contactforms/edit"
+@using Microsoft.EntityFrameworkCore
+@using AdoptionWebsiteTest.Models
+@inject IDbContextFactory<AdoptionWebsiteTest.Data.AdoptionWebsiteTestContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>ContactForm</h2>
+<hr />
+@if (ContactForm is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="ContactForm" OnValidSubmit="UpdateContactForm" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="ContactForm.Id" value="@ContactForm.Id" />
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email:</label>
+                    <InputText id="email" @bind-Value="ContactForm.Email" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => ContactForm.Email" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="questionsandconcerns" class="form-label">QuestionsAndConcerns:</label>
+                    <InputText id="questionsandconcerns" @bind-Value="ContactForm.QuestionsAndConcerns" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => ContactForm.QuestionsAndConcerns" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/contactforms">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private ContactForm? ContactForm { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        ContactForm ??= await context.ContactForm.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (ContactForm is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateContactForm()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(ContactForm!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!ContactFormExists(ContactForm!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/contactforms");
+    }
+
+    private bool ContactFormExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.ContactForm.Any(e => e.Id == id);
+    }
+}

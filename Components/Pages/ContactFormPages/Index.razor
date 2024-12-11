@@ -1,0 +1,42 @@
+﻿@page "/contactpage"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using AdoptionWebsiteTest.Models
+@using AdoptionWebsiteTest.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<AdoptionWebsiteTest.Data.AdoptionWebsiteTestContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Contact Page</h1>
+<div class="contact-info mb-4">
+            <p>
+                <strong>Email:</strong> <a href="mailto:info@adoptadog.com">info@adoptadog.com</a><br />
+                <strong>Phone:</strong> <a href="tel:+1234567890">(123) 456-7890</a>
+            </p>
+        </div>
+<p>
+    <a href="contactforms/create">Contact US</a>
+</p>
+
+<QuickGrid Class="table" Items="context.ContactForm">
+    <PropertyColumn Property="contactform => contactform.Email" />
+    <PropertyColumn Property="contactform => contactform.QuestionsAndConcerns" />
+
+    <TemplateColumn Context="contactform">
+        <a href="@($"contactforms/edit?id={contactform.Id}")">Edit</a> |
+        <a href="@($"contactforms/details?id={contactform.Id}")">Details</a> |
+        <a href="@($"contactforms/delete?id={contactform.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private AdoptionWebsiteTestContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

@@ -1,0 +1,180 @@
+﻿@page "/DogListAdmin"
+@using System.Text;
+@using AdoptionWebsiteTest.Models;
+@using Microsoft.Data.SqlClient;
+@using System;
+@using System.Data;
+@using System.Data.SqlClient;
+@using System.Collections;
+@inject NavigationManager NavigationManager;
+
+<h3>List of Available Dogs</h3>
+@if (dogList == null)
+//necessary check to prevent an error related to null values
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    //creates the table and the values that go into the table
+<table class="table">
+    <thead>
+        <tr>
+            <th>Photo</th>
+            <th>Name</th>
+            <th>Breed</th>
+            <th>Age</th>
+            <th>Description</th>
+            <th>Adopt the Dog!</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var dog in dogList)
+        {
+            <tr>
+                <td>@dog.photo</td>
+                <td>@dog.name</td>
+                <td>@dog.breed</td>
+                <td>@dog.age</td>
+                <td>@dog.description</td>
+                <td><!--put your code to create a link to the adoption form here--></td>
+                    <td>
+                        <button type="button" name="Delete" @onclick = "@DeleteOnClick" >Delete</button> 
+                        <button type="button" name="Edit" @onclick = "@EditOnClick">Edit</button>
+                   </td>
+            </tr>
+        }
+       
+    </tbody>
+</table>
+    @code {   
+    void DeleteOnClick(MouseEventArgs e)
+    {
+        NavigationManager.NavigateTo("/DeleteDog");  
+    }
+
+    void EditOnClick(MouseEventArgs e)
+        {
+        NavigationManager.NavigateTo("/EditDog");
+        }
+    
+
+    private dogListClass[]? dogList;
+    SqlConnection connectionString = new SqlConnection("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=DogDatabase;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
+
+  
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (connectionString.State != ConnectionState.Open)
+        {
+            connectionString.Close();
+            connectionString.Open();
+        }
+        // Simulate asynchronous loading to demonstrate streaming rendering
+        await Task.Delay(500);
+
+        //Query for to select the column that each dog will focus on
+
+        String nameQuery = "select dogName from DOG where ID = @incrementDogID";
+        String breedQuery = "select dogBreed from DOG where ID = @incrementDogID";
+        String ageQuery = "select dogAge from DOG where ID = @incrementDogID";
+        String descriptionQuery = "select dogDescription from DOG where ID = @incrementDogID";
+        String photoQuery = "select dogPhoto from DOG where ID = @incrementDogID";
+
+        //Count query to keep track of how many rows there are
+
+        String countQuery = "select count(*) from dog";
+        int count = 0;
+        SqlCommand cmdCount = new SqlCommand(countQuery, connectionString);
+        count = (int)cmdCount.ExecuteScalar();
+
+        // an array list that is created for each column
+
+        ArrayList nameList = new ArrayList();
+        ArrayList breedList = new ArrayList();
+        ArrayList ageList = new ArrayList();
+        ArrayList descriptionList = new ArrayList();
+        ArrayList photoList = new ArrayList();
+
+        // for loop to add in the values from the database to each respective arraylist
+
+        for(int i = 0; i < count; i++)
+        {
+
+            SqlCommand nameCommand = new SqlCommand(nameQuery, connectionString);
+            SqlCommand breedCommand = new SqlCommand(breedQuery, connectionString);
+            SqlCommand ageCommand = new SqlCommand(ageQuery, connectionString);
+            SqlCommand descriptionCommand = new SqlCommand(descriptionQuery, connectionString);
+            SqlCommand photoCommand = new SqlCommand(photoQuery, connectionString);
+
+            nameCommand.Parameters.AddWithValue("@incrementDogID", 1 + i);
+            breedCommand.Parameters.AddWithValue("@incrementDogID", 1 + i);
+            ageCommand.Parameters.AddWithValue("@incrementDogID", 1 + i);
+            descriptionCommand.Parameters.AddWithValue("@incrementDogID", 1 + i);
+            photoCommand.Parameters.AddWithValue("@incrementDogID", 1 + i);
+
+            nameList.Add(nameCommand.ExecuteScalar());
+            breedList.Add(breedCommand.ExecuteScalar());
+            ageList.Add(ageCommand.ExecuteScalar());
+            descriptionList.Add(descriptionCommand.ExecuteScalar());
+            photoList.Add(photoCommand.ExecuteScalar());
+
+        }
+
+
+        var tableName  = new SqlCommand(nameQuery, connectionString);
+        var tableBreed = new SqlCommand (breedQuery, connectionString);
+        var tableAge = new SqlCommand(ageQuery, connectionString);
+        var tableDescription = new SqlCommand(descriptionQuery, connectionString);
+
+        //Use the arraylists that have the values from the databases to create each row of each dog.
+
+        dogList = Enumerable.Range(0, count).Select(index => new dogListClass()
+            {
+                name = nameList[index],
+                breed = breedList[index],
+                age = ageList[index],
+                description = descriptionList[index]
+
+
+            }).ToArray();
+
+    }
+
+
+    // set and get for each variable in the class they are all objects to read the values from the databases
+    public class dogListClass
+    {
+
+        public object name 
+        {
+            get; set;
+        }
+
+        public object age
+        {
+            get; set;
+        }
+
+
+        public object description
+        {
+            get; set;
+        }
+
+        public object breed
+        {
+            get; set;
+        }
+        public object photo
+        {
+            get; set;
+        }
+
+    }
+
+}
+
+
+}

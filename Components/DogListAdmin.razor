@@ -6,8 +6,7 @@
 @using System.Data;
 @using System.Data.SqlClient;
 @using System.Collections;
-@inject NavigationManager Navigation
-
+@inject NavigationManager NavigationManager;
 
 <h3>List of Available Dogs</h3>
 @if (dogList == null)
@@ -40,23 +39,23 @@ else
                 <td>@dog.description</td>
                 <td><!--put your code to create a link to the adoption form here--></td>
                     <td>
-                        <button class="btn btn-primary" name="Delete" @onclick="DeleteOnClick" >Delete</button>
-                        <button class="btn btn-primary" name="Edit" @onclick="@EditOnClick">Edit</button>
+                        <button type="button" name="Delete" @onclick = "@DeleteOnClick" >Delete</button> 
+                        <button type="button" name="Edit" @onclick = "@EditOnClick">Edit</button>
                    </td>
             </tr>
         }
+       
     </tbody>
 </table>
-    @code {
-    private void DeleteOnClick()
+    @code {   
+    void DeleteOnClick(MouseEventArgs e)
     {
-        Navigation.NavigateTo("DeleteDog");
-        
+        NavigationManager.NavigateTo("/DeleteDog");  
     }
 
-    void EditOnClick()
+    void EditOnClick(MouseEventArgs e)
         {
-        Navigation.NavigateTo("/EditDog");
+        NavigationManager.NavigateTo("/EditDog");
         }
     
 

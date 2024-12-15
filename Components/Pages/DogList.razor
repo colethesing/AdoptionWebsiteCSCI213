@@ -38,6 +38,7 @@ else
                 <td>@dog.breed</td>
                 <td>@dog.age</td>
                 <td>@dog.description</td>
+                <td><!--put your code to create a link to the adoption form here--></td>
                 <td></td>
             </tr>
         }
@@ -57,26 +58,35 @@ else
         }
         // Simulate asynchronous loading to demonstrate streaming rendering
         await Task.Delay(500);
-
-        // These variables represent the values in the table. They can be changed to change the values in the table;
-
+        
+        //Query for to select the column that each dog will focus on
+     
         String nameQuery = "select dogName from DOG where ID = @incrementDogID";
         String breedQuery = "select dogBreed from DOG where ID = @incrementDogID";
         String ageQuery = "select dogAge from DOG where ID = @incrementDogID";
         String descriptionQuery = "select dogDescription from DOG where ID = @incrementDogID";
         String photoQuery = "select dogPhoto from DOG where ID = @incrementDogID";
+        
+        //Count query to keep track of how many rows there are
+
         String countQuery = "select count(*) from dog";
         int count = 0;
         SqlCommand cmdCount = new SqlCommand(countQuery, connectionString);
         count = (int)cmdCount.ExecuteScalar();
+        
+        // an array list that is created for each column
+        
         ArrayList nameList = new ArrayList();
         ArrayList breedList = new ArrayList();
         ArrayList ageList = new ArrayList();
         ArrayList descriptionList = new ArrayList();
         ArrayList photoList = new ArrayList();
+        
+        // for loop to add in the values from the database to each respective arraylist
+        
         for(int i = 0; i < count; i++)
         {
-            
+
             SqlCommand nameCommand = new SqlCommand(nameQuery, connectionString);
             SqlCommand breedCommand = new SqlCommand(breedQuery, connectionString);
             SqlCommand ageCommand = new SqlCommand(ageQuery, connectionString);
@@ -90,10 +100,10 @@ else
             photoCommand.Parameters.AddWithValue("@incrementDogID", 1 + i);
 
             nameList.Add(nameCommand.ExecuteScalar());
-            breedList.Add(nameCommand.ExecuteScalar());
-            ageList.Add(nameCommand.ExecuteScalar());
-            descriptionList.Add(nameCommand.ExecuteScalar());
-            photoList.Add(nameCommand.ExecuteScalar());
+            breedList.Add(breedCommand.ExecuteScalar());
+            ageList.Add(ageCommand.ExecuteScalar());
+            descriptionList.Add(descriptionCommand.ExecuteScalar());
+            photoList.Add(photoCommand.ExecuteScalar());
 
         }
 
@@ -102,24 +112,47 @@ else
         var tableBreed = new SqlCommand (breedQuery, connectionString);
         var tableAge = new SqlCommand(ageQuery, connectionString);
         var tableDescription = new SqlCommand(descriptionQuery, connectionString);
-        int increment = 0;
-        dogList = Enumerable.Range(1, count).Select(index => new dogListClass
+
+        //Use the arraylists that have the values from the databases to create each row of each dog.
+
+            dogList = Enumerable.Range(0, count).Select(index => new dogListClass()
             {
-                name = nameList[0].ToString(),
-                breed = breedList[0].ToString(),
-                age = Convert.ToInt32(ageList[0]),
-                description = descriptionList[0].ToString()
+                name = nameList[index],
+                breed = breedList[index],
+                age = ageList[index],
+                description = descriptionList[index]
+
             }).ToArray();
-            
+       
     }
 
-    // set and get for each variable in the class
-    private class dogListClass
+
+    // set and get for each variable in the class they are all objects to read the values from the databases
+    public class dogListClass
     {
-        public string name { get; set; }
-        public int age { get; set; }
-        public string description { get; set; }
-        public string breed { get; set; }
+
+        public object name 
+        {
+            get; set;
+        }
+
+        public object age
+        {
+            get; set;
+        }
+
+
+        public object description
+        {
+            get; set;
+        }
+
+        public object breed
+        {
+            get; set;
+        }
+
     }
+
 }
 

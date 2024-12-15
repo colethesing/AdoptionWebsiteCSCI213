@@ -52,8 +52,8 @@ namespace AdoptionWebsiteTest.Migrations
                     b.Property<int>("NumberOfPets")
                         .HasColumnType("int");
 
-                    b.Property<int>("PhoneNumber")
-                        .HasColumnType("int");
+                    b.Property<long>("PhoneNumber")
+                        .HasColumnType("bigint");
 
                     b.Property<bool>("PreviousDogOwner")
                         .HasColumnType("bit");

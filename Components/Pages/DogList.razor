@@ -33,7 +33,7 @@ else
         @foreach (var dog in dogList)
         {
             <tr>
-                <td></td>
+                <td>@dog.photo</td>
                 <td>@dog.name</td>
                 <td>@dog.breed</td>
                 <td>@dog.age</td>
@@ -58,32 +58,32 @@ else
         }
         // Simulate asynchronous loading to demonstrate streaming rendering
         await Task.Delay(500);
-        
+
         //Query for to select the column that each dog will focus on
-     
+
         String nameQuery = "select dogName from DOG where ID = @incrementDogID";
         String breedQuery = "select dogBreed from DOG where ID = @incrementDogID";
         String ageQuery = "select dogAge from DOG where ID = @incrementDogID";
         String descriptionQuery = "select dogDescription from DOG where ID = @incrementDogID";
         String photoQuery = "select dogPhoto from DOG where ID = @incrementDogID";
-        
+
         //Count query to keep track of how many rows there are
 
         String countQuery = "select count(*) from dog";
         int count = 0;
         SqlCommand cmdCount = new SqlCommand(countQuery, connectionString);
         count = (int)cmdCount.ExecuteScalar();
-        
+
         // an array list that is created for each column
-        
+
         ArrayList nameList = new ArrayList();
         ArrayList breedList = new ArrayList();
         ArrayList ageList = new ArrayList();
         ArrayList descriptionList = new ArrayList();
         ArrayList photoList = new ArrayList();
-        
+
         // for loop to add in the values from the database to each respective arraylist
-        
+
         for(int i = 0; i < count; i++)
         {
 
@@ -115,15 +115,16 @@ else
 
         //Use the arraylists that have the values from the databases to create each row of each dog.
 
-            dogList = Enumerable.Range(0, count).Select(index => new dogListClass()
+        dogList = Enumerable.Range(0, count).Select(index => new dogListClass()
             {
                 name = nameList[index],
                 breed = breedList[index],
                 age = ageList[index],
                 description = descriptionList[index]
 
+
             }).ToArray();
-       
+
     }
 
 
@@ -148,6 +149,10 @@ else
         }
 
         public object breed
+        {
+            get; set;
+        }
+        public object photo
         {
             get; set;
         }

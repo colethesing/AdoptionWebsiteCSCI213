@@ -36,31 +36,5 @@ class Connection
             connectionString.Close();
         }
 
-        string insertSql = "INSERT INTO DOG (dogName, dogAge, dogBreed, dogDescription, dogPhoto) VALUES (@dogName, @dogAge, @dogBreed, @dogBreed, @dogDescription, @dogPhoto)";
-        SqlCommand insertCommand = new SqlCommand(insertSql, connectionString);
-
-        // Parameters
-        insertCommand.Parameters.AddWithValue("@dogName", "Noodle");
-        insertCommand.Parameters.AddWithValue("@dogAge", "2");
-        insertCommand.Parameters.AddWithValue("@dogBreed", "Poodle");
-        insertCommand.Parameters.AddWithValue("@dogDescription", "Happy and waiting for a new home!");
-        insertCommand.Parameters.AddWithValue("@dogPhoto", "");
-
-        try
-        {
-            connectionString.Open();
-            int rowsAffected = insertCommand.ExecuteNonQuery();
-            Console.WriteLine($"Inserted {rowsAffected} row(s)!");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error: {ex.Message}");
-        }
-        finally
-        {
-            connectionString.Close();
-        }
-
-
     }
 }
